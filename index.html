@@ -706,7 +706,9 @@
                     each spatial patch, we compute a temporal difference signal (with Gaussian windowing between
                     consecutive maps) and measure its variance. Patches with variance above an adaptive threshold τ are
                     classified as edge regions. A post-processing pipeline (Gaussian smoothing → adaptive thresholding →
-                    morphological closing) produces a normalized edge confidence map <em>M ∈ [0,1]<sup>H×W</sup></em
+                    morphological closing) produces a normalized edge confidence map
+                    <span style="white-space: nowrap"
+                        ><em>M ∈ [0,1]<sup>H×W</sup></em></span
                     >. The temporal difference captures edges from both previous and current frames, enabling a
                     self-correction mechanism that removes geometrically inconsistent edges.
                 </p>
