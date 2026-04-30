@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>E2EGS: Event-to-Edge Gaussian Splatting</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #f9f8f6;
+                --surface: #ffffff;
+                --border: #e6e2dc;
+                --text: #18160f;
+                --text-secondary: #6a6157;
+                --accent: #5a3e9b;
+                --accent-light: #f0ecfa;
+                --accent2: #2b7a78;
+                --tag-bg: #18160f;
+                --tag-text: #f9f8f6;
+                --radius: 10px;
+                --shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+                --max-w: 860px;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: 'DM Sans', sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                line-height: 1.7;
+                font-size: 16px;
+            }
+
+            /* NAV */
+            .topbar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(249, 248, 246, 0.88);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--border);
+                padding: 10px 24px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            .topbar-title {
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--accent);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .topbar-links {
+                display: flex;
+                gap: 16px;
+                font-size: 13px;
+                flex-shrink: 0;
+            }
+            .topbar-links a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.15s;
+            }
+            .topbar-links a:hover {
+                color: var(--accent);
+            }
+
+            /* HERO */
+            .hero {
+                text-align: center;
+                padding: 72px 24px 56px;
+                max-width: var(--max-w);
+                margin: 0 auto;
+            }
+            .venue-badge {
+                display: inline-block;
+                background: var(--accent);
+                color: #fff;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                padding: 5px 16px;
+                border-radius: 99px;
+                margin-bottom: 26px;
+            }
+            .hero-title {
+                font-family: 'Crimson Pro', serif;
+                font-size: clamp(26px, 4.5vw, 46px);
+                font-weight: 600;
+                line-height: 1.2;
+                margin-bottom: 10px;
+            }
+            .hero-title span {
+                color: var(--accent);
+            }
+            .hero-subtitle {
+                font-family: 'Crimson Pro', serif;
+                font-size: clamp(16px, 2.5vw, 22px);
+                font-weight: 400;
+                color: var(--text-secondary);
+                margin-bottom: 30px;
+                font-style: italic;
+            }
+            .authors {
+                font-size: 16px;
+                margin-bottom: 6px;
+                line-height: 1.8;
+            }
+            .authors a {
+                color: var(--accent2);
+                text-decoration: none;
+                font-weight: 500;
+            }
+            .authors a:hover {
+                text-decoration: underline;
+            }
+            .affiliation {
+                font-size: 14px;
+                color: var(--text-secondary);
+                margin-bottom: 32px;
+            }
+
+            /* BUTTONS */
+            .btn-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+            }
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                padding: 10px 20px;
+                border-radius: 99px;
+                font-size: 14px;
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.18s ease;
+                cursor: pointer;
+                border: none;
+            }
+            .btn-primary {
+                background: var(--tag-bg);
+                color: var(--tag-text);
+            }
+            .btn-primary:hover {
+                background: #333;
+                transform: translateY(-1px);
+                box-shadow: var(--shadow);
+            }
+            .btn-outline {
+                background: var(--surface);
+                color: var(--text);
+                border: 1.5px solid var(--border);
+            }
+            .btn-outline:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+                transform: translateY(-1px);
+            }
+            .btn svg {
+                width: 15px;
+                height: 15px;
+                flex-shrink: 0;
+            }
+
+            /* DIVIDERS */
+            .divider {
+                height: 1px;
+                background: var(--border);
+                max-width: var(--max-w);
+                margin: 0 auto;
+            }
+            .divider-full {
+                height: 1px;
+                background: var(--border);
+            }
+
+            /* TEASER */
+            .teaser {
+                max-width: 920px;
+                margin: 0 auto;
+                padding: 52px 24px;
+                text-align: center;
+            }
+            .teaser img {
+                width: 100%;
+                max-width: 840px;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+            .ph {
+                background: linear-gradient(135deg, #ede9f8, #e6f5f4);
+                border-radius: var(--radius);
+                border: 1px dashed #c5bce8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                gap: 8px;
+                color: #9b94c0;
+                font-size: 13.5px;
+            }
+            .teaser-caption {
+                margin-top: 16px;
+                font-size: 14px;
+                color: var(--text-secondary);
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
+                line-height: 1.65;
+                text-align: left;
+            }
+
+            /* SECTIONS */
+            .section {
+                max-width: 780px;
+                margin: 0 auto;
+                padding: 52px 24px;
+            }
+            .section-label {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--accent);
+                margin-bottom: 10px;
+            }
+            .section-title {
+                font-family: 'Crimson Pro', serif;
+                font-size: 30px;
+                font-weight: 600;
+                margin-bottom: 20px;
+                line-height: 1.3;
+            }
+            .section p {
+                color: var(--text-secondary);
+                margin-bottom: 14px;
+                line-height: 1.78;
+            }
+            .section p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* TLDR */
+            .tldr-box {
+                background: var(--accent-light);
+                border-left: 3px solid var(--accent);
+                border-radius: 0 var(--radius) var(--radius) 0;
+                padding: 18px 22px;
+                margin-bottom: 28px;
+            }
+            .tldr-label {
+                font-weight: 600;
+                color: var(--accent);
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 5px;
+            }
+            .tldr-box p {
+                color: var(--text) !important;
+                margin: 0;
+                font-size: 15px;
+                line-height: 1.65;
+            }
+
+            /* CONTRIBUTIONS */
+            .contrib-list {
+                list-style: none;
+                margin-top: 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            .contrib-list li {
+                display: flex;
+                gap: 14px;
+                align-items: flex-start;
+            }
+            .contrib-num {
+                flex-shrink: 0;
+                width: 28px;
+                height: 28px;
+                background: var(--accent);
+                color: #fff;
+                border-radius: 50%;
+                font-size: 13px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 2px;
+            }
+            .contrib-list li p {
+                margin: 0 !important;
+                font-size: 15px;
+                color: var(--text-secondary);
+            }
+            .contrib-list li strong {
+                color: var(--text);
+            }
+
+            /* FULL-WIDTH FIGURE */
+            .fig-full {
+                max-width: 920px;
+                margin: 0 auto;
+                padding: 0 24px 52px;
+                text-align: center;
+            }
+            .fig-full img {
+                width: 100%;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+            .fig-caption {
+                margin-top: 14px;
+                font-size: 13.5px;
+                color: var(--text-secondary);
+                text-align: left;
+                line-height: 1.65;
+            }
+            .fig-caption strong {
+                color: var(--text);
+            }
+
+            /* METHOD SUB-BLOCKS */
+            .method-block {
+                border-left: 2px solid var(--border);
+                padding-left: 18px;
+                margin-top: 28px;
+            }
+            .method-block-title {
+                font-weight: 600;
+                color: var(--text);
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            /* TABLES */
+            .table-wrap {
+                overflow-x: auto;
+                margin-top: 24px;
+                border-radius: var(--radius);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px;
+                font-family: 'DM Sans', sans-serif;
+            }
+            caption {
+                padding: 12px 16px 8px;
+                text-align: left;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text);
+                caption-side: top;
+                background: var(--surface);
+            }
+            thead tr:first-child th {
+                background: var(--tag-bg);
+                color: var(--tag-text);
+                padding: 10px 12px;
+                font-weight: 500;
+                font-size: 12px;
+                letter-spacing: 0.03em;
+                text-align: center;
+            }
+            thead tr.subhead th {
+                background: #2e2a22;
+                color: #bbb;
+                font-size: 11px;
+                padding: 6px 12px;
+                font-weight: 400;
+                text-align: center;
+                letter-spacing: 0.04em;
+            }
+            tbody td {
+                padding: 8px 12px;
+                text-align: center;
+                border-bottom: 1px solid var(--border);
+                color: var(--text-secondary);
+                font-variant-numeric: tabular-nums;
+            }
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+            tbody tr:hover {
+                background: #f5f2ef;
+            }
+            tbody td:first-child {
+                text-align: left;
+                font-weight: 500;
+                color: var(--text);
+            }
+            tbody tr.ours td {
+                background: var(--accent-light);
+            }
+            tbody tr.ours td:first-child {
+                color: var(--accent);
+                font-weight: 700;
+            }
+            .best {
+                font-weight: 700;
+                color: var(--accent);
+            }
+            .ul {
+                text-decoration: underline;
+                text-decoration-color: var(--accent2);
+                text-underline-offset: 2px;
+            }
+            .dash {
+                color: #ccc;
+            }
+            .note {
+                font-size: 13px;
+                color: var(--text-secondary);
+                margin-top: 10px;
+            }
+
+            /* ABLATION */
+            .ablation-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-top: 24px;
+            }
+            @media (max-width: 600px) {
+                .ablation-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* VIDEO */
+            .video-wrap {
+                margin-top: 24px;
+                border-radius: var(--radius);
+                overflow: hidden;
+                aspect-ratio: 16/9;
+                background: #111;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .video-wrap iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+            .video-placeholder {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                color: #666;
+                font-size: 13px;
+            }
+
+            /* BIBTEX */
+            .bibtex-wrap {
+                margin-top: 20px;
+                position: relative;
+            }
+            .bibtex-code {
+                background: #1a1714;
+                color: #c9b99a;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12.5px;
+                padding: 24px;
+                border-radius: var(--radius);
+                overflow-x: auto;
+                line-height: 1.65;
+                white-space: pre;
+            }
+            .copy-btn {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                background: rgba(255, 255, 255, 0.08);
+                color: #c9b99a;
+                border: none;
+                border-radius: 6px;
+                padding: 5px 12px;
+                font-size: 12px;
+                cursor: pointer;
+                font-family: 'DM Sans', sans-serif;
+                transition: background 0.15s;
+            }
+            .copy-btn:hover {
+                background: rgba(255, 255, 255, 0.18);
+            }
+
+            /* ACK */
+            .ack {
+                background: #f2f0ec;
+                border-radius: var(--radius);
+                padding: 18px 20px;
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-top: 20px;
+            }
+
+            /* FOOTER */
+            footer {
+                text-align: center;
+                padding: 28px 24px;
+                font-size: 13px;
+                color: var(--text-secondary);
+                border-top: 1px solid var(--border);
+            }
+            footer a {
+                color: var(--accent2);
+                text-decoration: none;
+            }
+
+            @media (max-width: 640px) {
+                .hero {
+                    padding: 48px 16px 40px;
+                }
+                .section {
+                    padding: 36px 16px;
+                }
+                .topbar-links {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- NAV -->
+        <nav class="topbar">
+            <span class="topbar-title">E2EGS — Event-to-Edge Gaussian Splatting</span>
+            <div class="topbar-links">
+                <a href="#abstract">Abstract</a>
+                <a href="#method">Method</a>
+                <a href="#results">Results</a>
+                <a href="#bibtex">BibTeX</a>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <section class="hero">
+            <span class="venue-badge">CVPR 2025 Highlight</span>
+            <h1 class="hero-title"><span>E2EGS</span>: Event-to-Edge Gaussian Splatting</h1>
+            <p class="hero-subtitle">for Pose-Free 3D Reconstruction</p>
+
+            <p class="authors">
+                <a href="#">Yunsoo Kim</a><sup>1</sup>,&ensp; <a href="#">Changki Sung</a><sup>1</sup>,&ensp;
+                <a href="#">Dasol Hong</a><sup>1</sup>,&ensp; <a href="#">Hyun Myung</a><sup>1*</sup>
+            </p>
+            <p class="affiliation">
+                <sup>1</sup>Urban Robotics Lab, School of Electrical Engineering, KAIST<br />
+                <sup>*</sup>Corresponding author &nbsp;·&nbsp; {dbstn1121, cs1032, ds.hong, hmyung}@kaist.ac.kr
+            </p>
+
+            <div class="btn-group">
+                <a class="btn btn-primary" href="https://arxiv.org/pdf/2603.14684" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"
+                        />
+                    </svg>
+                    Paper
+                </a>
+                <a class="btn btn-outline" href="https://arxiv.org/abs/2603.14684" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M9 9h6M9 12h6M9 15h4" />
+                    </svg>
+                    arXiv
+                </a>
+                <a class="btn btn-outline" href="https://www.youtube.com/watch?v=6oWVDy8yygI&t=14s" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M10 15l5.19-3L10 9v6zm11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"
+                        />
+                    </svg>
+                    Video
+                </a>
+                <a class="btn btn-outline" href="#" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"
+                        />
+                    </svg>
+                    Code
+                </a>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- TEASER -->
+        <div class="teaser">
+            <!-- <img src="static/pipeline.png" alt="E2EGS pipeline overview"> -->
+            <div class="ph" style="height: 380px; max-width: 840px; margin: 0 auto">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b0a8d6" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                </svg>
+                Replace with: &lt;img src="static/overview.png"&gt;
+            </div>
+            <p class="teaser-caption">
+                <strong>Figure 1. Edge-guided reconstruction framework.</strong>
+                Our pipeline extracts robust edges from consecutive event maps via temporal coherence analysis,
+                initializes edge-aware 3D Gaussians with inverse depth sampling, and applies edge-guided losses during
+                joint optimization of scene representation and camera trajectory. Depth sampling generates edge-guided
+                Gaussians along viewing rays, while surface sampling randomly initializes complementary Gaussians for
+                texture-less regions.
+            </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ABSTRACT -->
+        <section class="section" id="abstract">
+            <p class="section-label">Abstract</p>
+
+            <div class="tldr-box">
+                <span class="tldr-label">TL;DR</span>
+                <p>
+                    E2EGS is a fully pose-free 3D reconstruction framework operating solely on event streams, using edge
+                    information extracted via patch-based temporal coherence analysis to achieve superior trajectory
+                    estimation and high-quality novel view synthesis — without any depth models or auxiliary sensors.
+                </p>
+            </div>
+
+            <ul class="contrib-list">
+                <li>
+                    <div class="contrib-num">1</div>
+                    <p>
+                        <strong>Patch-based temporal coherence analysis</strong> — a noise-resistant edge detection
+                        method that exploits consistent temporal signatures of edges across consecutive event maps,
+                        without expensive trajectory estimation.
+                    </p>
+                </li>
+                <li>
+                    <div class="contrib-num">2</div>
+                    <p>
+                        <strong>Geometry-centric 3D Gaussian learning</strong> — edge-aware Gaussian initialization with
+                        inverse depth sampling and edge-weighted losses that prioritize geometric constraints over
+                        texture matching.
+                    </p>
+                </li>
+                <li>
+                    <div class="contrib-num">3</div>
+                    <p>
+                        <strong>Comprehensive evaluation</strong> on synthetic Replica and real-world TUM-VIE datasets,
+                        demonstrating superior trajectory estimation and competitive reconstruction quality using event
+                        streams alone.
+                    </p>
+                </li>
+            </ul>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- METHOD -->
+        <section class="section" id="method">
+            <p class="section-label">Method</p>
+            <h2 class="section-title">Edge-Guided Reconstruction Framework</h2>
+            <p>
+                E2EGS builds on 3D Gaussian splatting as the scene representation and follows a SLAM-inspired
+                tracking–mapping pipeline. The system processes event streams in temporal chunks, alternating between
+                <em>tracking</em> (estimating motion for new chunks) and <em>mapping</em> (joint bundle adjustment of
+                trajectories and Gaussians in a sliding window).
+            </p>
+        </section>
+
+        <section class="section" style="padding-top: 0">
+            <div class="method-block">
+                <p class="method-block-title">Robust Edge Detection via Temporal Coherence Analysis</p>
+                <p>
+                    We exploit that edges generate consistent temporal signatures across consecutive event maps. For
+                    each spatial patch, we compute a temporal difference signal (with Gaussian windowing between
+                    consecutive maps) and measure its variance. Patches with variance above an adaptive threshold τ are
+                    classified as edge regions. A post-processing pipeline (Gaussian smoothing → adaptive thresholding →
+                    morphological closing) produces a normalized edge confidence map <em>M ∈ [0,1]<sup>H×W</sup></em
+                    >. The temporal difference captures edges from both previous and current frames, enabling a
+                    self-correction mechanism that removes geometrically inconsistent edges.
+                </p>
+            </div>
+
+            <div class="method-block">
+                <p class="method-block-title">Edge-Guided Gaussian Initialization</p>
+                <p>
+                    2D edge points are clustered via a recursive grid-based approach with PCA on local edge
+                    orientations. Each cluster produces a 2D edge Gaussian; these are lifted to 3D via inverse depth
+                    sampling along viewing rays — concentrating samples at farther distances to enhance observability of
+                    rotational motion. Random Gaussians supplement smooth texture-less surfaces. The edge ratio
+                    <em>r</em><sub>edge</sub> ∈ [0.1, 0.3] provides the optimal balance between geometric constraints
+                    and surface coverage.
+                </p>
+            </div>
+
+            <div class="method-block">
+                <p class="method-block-title">Edge-Guided Optimization</p>
+                <p>
+                    The edge-guided loss spatially weights the photometric reconstruction error by edge confidence:
+                    <em>w(<b>x</b>) = 1 + β · M(<b>x</b>)</em>, amplifying gradients at geometrically salient
+                    boundaries. The total loss combines this with a structural dissimilarity (D-SSIM) term, enabling
+                    faster convergence and more accurate depth estimation at object edges throughout tracking and bundle
+                    adjustment.
+                </p>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- RESULTS -->
+        <section class="section" id="results">
+            <p class="section-label">Experiments</p>
+            <h2 class="section-title">Quantitative Results</h2>
+            <p>
+                We evaluate on the synthetic <strong>Replica</strong> dataset (room0, room2, office0, office2, office3)
+                and real-world <strong>TUM-VIE</strong> sequences (1d, 3d, 6dof, desk, desk2). NVS quality is measured
+                by PSNR / SSIM / LPIPS; trajectory accuracy by Absolute Trajectory Error (ATE, RMSE in cm).
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <caption>
+                        Table 1. NVS performance on Replica dataset. † = no depth supervision. * = uses E2VID + COLMAP
+                        for poses.
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Method</th>
+                            <th colspan="3">room0</th>
+                            <th colspan="3">room2</th>
+                            <th colspan="3">office0</th>
+                            <th colspan="3">office2</th>
+                            <th colspan="3">office3</th>
+                        </tr>
+                        <tr class="subhead">
+                            <th></th>
+                            <th>PSNR↑</th>
+                            <th>SSIM↑</th>
+                            <th>LPIPS↓</th>
+                            <th>PSNR↑</th>
+                            <th>SSIM↑</th>
+                            <th>LPIPS↓</th>
+                            <th>PSNR↑</th>
+                            <th>SSIM↑</th>
+                            <th>LPIPS↓</th>
+                            <th>PSNR↑</th>
+                            <th>SSIM↑</th>
+                            <th>LPIPS↓</th>
+                            <th>PSNR↑</th>
+                            <th>SSIM↑</th>
+                            <th>LPIPS↓</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EvGGS</td>
+                            <td>17.57</td>
+                            <td>0.32</td>
+                            <td>0.68</td>
+                            <td>11.28</td>
+                            <td>0.31</td>
+                            <td>0.69</td>
+                            <td>14.34</td>
+                            <td>0.22</td>
+                            <td>0.66</td>
+                            <td>14.82</td>
+                            <td>0.32</td>
+                            <td>0.73</td>
+                            <td>15.51</td>
+                            <td>0.28</td>
+                            <td>0.68</td>
+                        </tr>
+                        <tr>
+                            <td>Event-3DGS*</td>
+                            <td>22.27</td>
+                            <td>0.84</td>
+                            <td>0.30</td>
+                            <td>16.39</td>
+                            <td>0.68</td>
+                            <td>0.36</td>
+                            <td>15.97</td>
+                            <td>0.64</td>
+                            <td>0.51</td>
+                            <td>18.19</td>
+                            <td>0.60</td>
+                            <td>0.48</td>
+                            <td>17.82</td>
+                            <td>0.84</td>
+                            <td>0.31</td>
+                        </tr>
+                        <tr>
+                            <td>IncEventGS</td>
+                            <td class="ul">23.54</td>
+                            <td class="ul">0.86</td>
+                            <td class="ul">0.20</td>
+                            <td class="best">23.25</td>
+                            <td class="ul">0.76</td>
+                            <td class="ul">0.27</td>
+                            <td>26.53</td>
+                            <td>0.49</td>
+                            <td>0.44</td>
+                            <td>21.27</td>
+                            <td>0.76</td>
+                            <td>0.29</td>
+                            <td>19.21</td>
+                            <td>0.82</td>
+                            <td class="ul">0.19</td>
+                        </tr>
+                        <tr>
+                            <td>IncEventGS†</td>
+                            <td>19.81</td>
+                            <td>0.83</td>
+                            <td>0.24</td>
+                            <td>22.58</td>
+                            <td>0.73</td>
+                            <td>0.29</td>
+                            <td class="ul">27.72</td>
+                            <td class="ul">0.51</td>
+                            <td class="ul">0.40</td>
+                            <td class="ul">24.48</td>
+                            <td class="ul">0.83</td>
+                            <td class="ul">0.26</td>
+                            <td class="ul">20.04</td>
+                            <td class="ul">0.85</td>
+                            <td class="best">0.18</td>
+                        </tr>
+                        <tr class="ours">
+                            <td>Ours</td>
+                            <td class="best">23.86</td>
+                            <td class="best">0.87</td>
+                            <td class="best">0.19</td>
+                            <td class="ul">23.01</td>
+                            <td class="best">0.77</td>
+                            <td class="best">0.26</td>
+                            <td class="best">28.01</td>
+                            <td class="best">0.52</td>
+                            <td class="best">0.41</td>
+                            <td class="best">24.86</td>
+                            <td class="best">0.83</td>
+                            <td class="best">0.25</td>
+                            <td class="best">20.75</td>
+                            <td class="best">0.85</td>
+                            <td class="ul">0.19</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-wrap" style="margin-top: 24px">
+                <table>
+                    <caption>
+                        Table 2. Absolute Trajectory Error (ATE) RMSE (cm) on Replica and TUM-VIE. Our method achieves
+                        competitive performance using event data alone.
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Method</th>
+                            <th colspan="5">Synthetic — Replica</th>
+                            <th colspan="5">Real-world — TUM-VIE</th>
+                        </tr>
+                        <tr class="subhead">
+                            <th></th>
+                            <th>room0</th>
+                            <th>room2</th>
+                            <th>office0</th>
+                            <th>office2</th>
+                            <th>office3</th>
+                            <th>1d</th>
+                            <th>3d</th>
+                            <th>6dof</th>
+                            <th>desk</th>
+                            <th>desk2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DEVO</td>
+                            <td>0.271</td>
+                            <td>0.381</td>
+                            <td>0.287</td>
+                            <td>0.134</td>
+                            <td>0.356</td>
+                            <td class="best">0.23</td>
+                            <td>1.00</td>
+                            <td>1.82</td>
+                            <td>0.55</td>
+                            <td>0.75</td>
+                        </tr>
+                        <tr>
+                            <td>ESVO2</td>
+                            <td class="dash">—</td>
+                            <td class="dash">—</td>
+                            <td class="dash">—</td>
+                            <td class="dash">—</td>
+                            <td class="dash">—</td>
+                            <td>1.08</td>
+                            <td>1.51</td>
+                            <td>1.49</td>
+                            <td>0.89</td>
+                            <td>2.65</td>
+                        </tr>
+                        <tr>
+                            <td>IncEventGS</td>
+                            <td class="ul">0.051</td>
+                            <td class="ul">0.071</td>
+                            <td class="ul">0.085</td>
+                            <td class="best">0.041</td>
+                            <td class="best">0.058</td>
+                            <td>2.19</td>
+                            <td>1.62</td>
+                            <td class="ul">0.70</td>
+                            <td class="ul">0.15</td>
+                            <td class="ul">0.41</td>
+                        </tr>
+                        <tr>
+                            <td>IncEventGS†</td>
+                            <td>6.817</td>
+                            <td>0.446</td>
+                            <td>0.698</td>
+                            <td>0.513</td>
+                            <td>1.379</td>
+                            <td>2.58</td>
+                            <td>4.48</td>
+                            <td>8.24</td>
+                            <td>0.78</td>
+                            <td>96.59</td>
+                        </tr>
+                        <tr class="ours">
+                            <td>Ours</td>
+                            <td class="best">0.049</td>
+                            <td class="best">0.065</td>
+                            <td class="best">0.078</td>
+                            <td class="ul">0.070</td>
+                            <td class="ul">0.077</td>
+                            <td class="ul">1.12</td>
+                            <td class="best">0.65</td>
+                            <td class="best">0.58</td>
+                            <td class="best">0.12</td>
+                            <td class="best">0.40</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="note">
+                <span style="color: var(--accent); font-weight: 700">Bold</span>: best.&nbsp;
+                <span style="text-decoration: underline; text-decoration-color: var(--accent2)">Underline</span>: second
+                best.&nbsp; † = no depth supervision. * = uses E2VID + COLMAP poses. ESVO2 evaluated on real datasets
+                only.
+            </p>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- QUALITATIVE -->
+        <section class="section">
+            <p class="section-label">Qualitative Results</p>
+            <h2 class="section-title">Visual Comparisons</h2>
+            <p>
+                Our edge-guided approach produces sharper boundaries and cleaner surfaces. IncEventGS shows failure
+                modes including wave-like artifacts in texture-less regions, missing fine details, and indistinct object
+                boundaries. IncEventGS† exhibits severe reconstruction failures due to accumulated trajectory errors
+                from random initialization.
+            </p>
+
+            <div
+                style="
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 3px;
+                    margin-top: 20px;
+                    text-align: center;
+                "
+            >
+                <div style="font-size: 11px; color: var(--text-secondary); padding: 0 0 6px">Ground Truth</div>
+                <div style="font-size: 11px; color: var(--text-secondary); padding: 0 0 6px">IncEventGS</div>
+                <div style="font-size: 11px; color: var(--text-secondary); padding: 0 0 6px">IncEventGS†</div>
+                <div style="font-size: 11px; color: var(--accent); font-weight: 600; padding: 0 0 6px">Ours</div>
+                <!-- Row 1 -->
+                <div class="ph" style="height: 110px; font-size: 11px">room0 — static/qual_room0_gt.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px">static/qual_room0_base.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px">static/qual_room0_nodepth.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px; border-color: var(--accent)">
+                    static/qual_room0_ours.png
+                </div>
+                <!-- Row 2 -->
+                <div class="ph" style="height: 110px; font-size: 11px">office0 — static/qual_office0_gt.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px">static/qual_office0_base.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px">static/qual_office0_nodepth.png</div>
+                <div class="ph" style="height: 110px; font-size: 11px; border-color: var(--accent)">
+                    static/qual_office0_ours.png
+                </div>
+            </div>
+            <p class="note" style="margin-top: 10px">
+                Replace placeholder boxes with <code>&lt;img src="static/qual_*.png"&gt;</code> in the HTML.
+            </p>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- VIDEO -->
+        <section class="section">
+            <p class="section-label">Video</p>
+            <h2 class="section-title">Presentation</h2>
+            <div class="video-wrap">
+                <!-- <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe> -->
+                <div class="video-placeholder">
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="#555">
+                        <path
+                            d="M10 15l5.19-3L10 9v6zm11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"
+                        />
+                    </svg>
+                    Uncomment the iframe above and replace YOUR_VIDEO_ID
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- BIBTEX -->
+        <section class="section" id="bibtex">
+            <p class="section-label">Citation</p>
+            <h2 class="section-title">BibTeX</h2>
+            <p>If you find our work useful, please consider citing:</p>
+            <div class="bibtex-wrap">
+                <button class="copy-btn" onclick="copyBibtex()">Copy</button>
+                <pre class="bibtex-code" id="bibtex-entry">
+@inproceedings{kim2025e2egs,
+  title     = {E2EGS: Event-to-Edge Gaussian Splatting for Pose-Free 3D Reconstruction},
+  author    = {Kim, Yunsoo and Sung, Changki and Hong, Dasol and Myung, Hyun},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision
+               and Pattern Recognition (CVPR)},
+  year      = {2025}
+}</pre
+                >
+            </div>
+
+            <div class="ack">
+                <strong>Acknowledgements.</strong> This work was supported in part by the Institute of Information &amp;
+                Communications Technology Planning &amp; Evaluation (IITP) grant funded by the Korea government (MSIT)
+                (No. RS-2025-02303870, Software Technology for Efficient Multimodal Visual Information Processing in
+                High-Speed Spatial Interactions), and in part by the Korea Evaluation Institute of Industrial Technology
+                (KEIT) grant funded by the Korea government (MOTIE) (No. 20023455, Development of Cooperative Mapping,
+                Environment Recognition and Autonomous Driving Technology for Multi Mobile Robots Operating in
+                Large-scale Indoor Workspace). The students are supported by BK21 FOUR from the Ministry of Education
+                (Republic of Korea).
+            </div>
+        </section>
+
+        <div class="divider-full"></div>
+
+        <footer>
+            <p>
+                © 2025 Urban Robotics Lab, KAIST &nbsp;·&nbsp; Website source on
+                <a href="https://github.com/YunsooKim/E2EGS">GitHub</a>
+            </p>
+        </footer>
+
+        <script>
+            function copyBibtex() {
+                const text = document.getElementById('bibtex-entry').innerText
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = document.querySelector('.copy-btn')
+                    btn.textContent = 'Copied!'
+                    setTimeout(() => (btn.textContent = 'Copy'), 2000)
+                })
+            }
+            document.querySelectorAll('a[href^="#"]').forEach((a) => {
+                a.addEventListener('click', (e) => {
+                    const target = document.querySelector(a.getAttribute('href'))
+                    if (target) {
+                        e.preventDefault()
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }
+                })
+            })
+        </script>
+    </body>
+</html>
