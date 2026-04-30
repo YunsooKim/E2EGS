@@ -611,29 +611,6 @@
 
         <div class="divider"></div>
 
-        <!-- TEASER -->
-        <div class="teaser">
-            <!-- <img src="static/pipeline.png" alt="E2EGS pipeline overview"> -->
-            <div class="ph" style="height: 380px; max-width: 840px; margin: 0 auto">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b0a8d6" stroke-width="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                </svg>
-                Replace with: &lt;img src="static/overview.png"&gt;
-            </div>
-            <p class="teaser-caption">
-                <strong>Figure 1. Edge-guided reconstruction framework.</strong>
-                Our pipeline extracts robust edges from consecutive event maps via temporal coherence analysis,
-                initializes edge-aware 3D Gaussians with inverse depth sampling, and applies edge-guided losses during
-                joint optimization of scene representation and camera trajectory. Depth sampling generates edge-guided
-                Gaussians along viewing rays, while surface sampling randomly initializes complementary Gaussians for
-                texture-less regions.
-            </p>
-        </div>
-
-        <div class="divider"></div>
-
         <!-- ABSTRACT -->
         <section class="section" id="abstract">
             <p class="section-label">Abstract</p>
@@ -687,6 +664,38 @@
                 <em>tracking</em> (estimating motion for new chunks) and <em>mapping</em> (joint bundle adjustment of
                 trajectories and Gaussians in a sliding window).
             </p>
+
+            <!-- Pipeline figure -->
+            <div style="margin-top: 28px; text-align: center">
+                <img
+                    src="static/pipeline.png"
+                    alt="E2EGS pipeline overview"
+                    style="
+                        width: 100%;
+                        border-radius: var(--radius);
+                        border: 1px solid var(--border);
+                        box-shadow: var(--shadow);
+                    "
+                />
+                <!-- placeholder — remove the div below once pipeline.png is added -->
+                <div class="ph" style="height: 320px; display: none">
+                    Replace with: &lt;img src="static/pipeline.png"&gt;
+                </div>
+                <p
+                    style="
+                        margin-top: 14px;
+                        font-size: 13.5px;
+                        color: var(--text-secondary);
+                        text-align: left;
+                        line-height: 1.65;
+                    "
+                >
+                    <strong>Figure 1. Edge-guided reconstruction framework.</strong>
+                    Our pipeline extracts robust edges from consecutive event maps via temporal coherence analysis,
+                    initializes edge-aware 3D Gaussians with inverse depth sampling, and applies edge-guided losses
+                    during joint optimization of scene representation and camera trajectory.
+                </p>
+            </div>
         </section>
 
         <section class="section" style="padding-top: 0">
@@ -1022,17 +1031,8 @@
         <!-- VIDEO -->
         <section class="section">
             <p class="section-label">Video</p>
-            <h2 class="section-title">Presentation</h2>
             <div class="video-wrap">
-                <!-- <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe> -->
-                <div class="video-placeholder">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="#555">
-                        <path
-                            d="M10 15l5.19-3L10 9v6zm11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"
-                        />
-                    </svg>
-                    Uncomment the iframe above and replace YOUR_VIDEO_ID
-                </div>
+                <iframe src="https://www.youtube.com/embed/6oWVDy8yygI" allowfullscreen></iframe>
             </div>
         </section>
 
