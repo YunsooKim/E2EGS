@@ -987,10 +987,10 @@
             <p class="section-label">Qualitative Results</p>
             <h2 class="section-title">Visual Comparisons</h2>
             <p>
-                Our edge-guided approach produces sharper boundaries and cleaner surfaces. IncEventGS shows failure
-                modes including wave-like artifacts in texture-less regions, missing fine details, and indistinct object
-                boundaries. IncEventGS† exhibits severe reconstruction failures due to accumulated trajectory errors
-                from random initialization.
+                Our edge-guided approach achieves accurate reconstruction with sharp textures and correct spatial
+                alignment. IncEventGS exhibits multiple failure modes: spatial misalignment causing viewpoint shifts and
+                blurred regions in distant areas beyond initial coverage (top), and objects disappearing (bottom).
+                IncEventGS† fails to reconstruct scenes due to severe trajectory errors.
             </p>
 
             <div
@@ -1007,15 +1007,57 @@
                 <div style="font-size: 11px; color: var(--text-secondary); padding: 0 0 6px">IncEventGS†</div>
                 <div style="font-size: 11px; color: var(--accent); font-weight: 600; padding: 0 0 6px">Ours</div>
                 <!-- Row 1 -->
-                <img src="static/gt_3d_cropped_checked.png" alt="GT 3d_comp" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/inc_3d_comp_checked.png" alt="IncEventGS 3d_comp" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/w_o_3d_comp_checked.png" alt="IncEventGS† 3d_comp" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/ours_3d_comp_checked.png" alt="Ours 3d_comp" style="width: 100%; border-radius: var(--radius); outline: 2px solid var(--accent); object-fit: cover;" />
+                <img
+                    src="static/gt_desk2_checked.png"
+                    alt="GT desk2"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/inc_desk2_checked.png"
+                    alt="IncEventGS desk2"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/w_o_desk2_checked.png"
+                    alt="IncEventGS† desk2"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/ours_desk2_checked.png"
+                    alt="Ours desk2"
+                    style="
+                        width: 100%;
+                        border-radius: var(--radius);
+                        outline: 2px solid var(--accent);
+                        object-fit: cover;
+                    "
+                />
                 <!-- Row 2 -->
-                <img src="static/gt_desk2_checked.png" alt="GT desk2" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/inc_desk2_checked.png" alt="IncEventGS desk2" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/w_o_desk2_checked.png" alt="IncEventGS† desk2" style="width: 100%; border-radius: var(--radius); object-fit: cover;" />
-                <img src="static/ours_desk2_checked.png" alt="Ours desk2" style="width: 100%; border-radius: var(--radius); outline: 2px solid var(--accent); object-fit: cover;" />
+                <img
+                    src="static/gt_3d_cropped_checked.png"
+                    alt="GT 3d_comp"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/inc_3d_comp_checked.png"
+                    alt="IncEventGS 3d_comp"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/w_o_3d_comp_checked.png"
+                    alt="IncEventGS† 3d_comp"
+                    style="width: 100%; border-radius: var(--radius); object-fit: cover"
+                />
+                <img
+                    src="static/ours_3d_comp_checked.png"
+                    alt="Ours 3d_comp"
+                    style="
+                        width: 100%;
+                        border-radius: var(--radius);
+                        outline: 2px solid var(--accent);
+                        object-fit: cover;
+                    "
+                />
             </div>
         </section>
 
